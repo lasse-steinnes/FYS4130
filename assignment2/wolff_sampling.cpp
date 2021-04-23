@@ -48,6 +48,7 @@ void IsingMonteCarlo::wolff_sampling2D(int node_i, int node_j){
   queue[0] = node_id; // index for spin given as search key
   cluster[node_id] = 1; // store node_id to cluster
   S2d[node_id] *= -1; // flip spin
+  m_MagneticMoment2d += 2*S2d[node_id]; // change magnetic moment
   discovered_i[0] = node_i;
   discovered_j[0] = node_j;
 

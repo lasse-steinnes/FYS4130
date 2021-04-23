@@ -47,6 +47,7 @@ int main(int argc, char const *argv[]){
   int * map = new int[L + 2]; // allocate
   map[0] = L - 1; // first index in map --> last index in physical mesh
   map[L+1] = 0; // last index in map --> first index in physical mesh
+  int N_bins = 10;
 
   if (dims == 1){
     // intialize 1D case
@@ -61,10 +62,35 @@ int main(int argc, char const *argv[]){
     map[i+1] = i;
   }
 
+    double *ana = new double[3];
+
     Solver.init2D(L, T_start,T_end, n_T, map);
-    //int i = 0, j = 1;
-    //Solver.wolff_sampling2D(i,j);
-    Solver.solve2D(calib, MC, rank);
+    ana = Solver.solve2D(calib, MC, N_bins, rank);
+
+    /*
+  int calibration = 20000;
+  int L = 2;
+  int MC = 1e7;
+  double T = 1.0;
+  double T2 = 1.0;
+  int n = 1;
+  double B = 1./T;
+  int rank = 0;
+    */
+
+    double T = 1.0;
+    double B = 1./T;
+    double z = 12. + 4*cosh(8*B);
+    double mean_abs_M = (8./z)*(exp(8*B) + 2);
+    double xi = ((double) 32/(T*z))*(exp(8*B) + 1);
+
+    for (int i = 0; i < 3; i++){
+      cout << ana[i] << "\n";
+    }
+
+    cout << xi/((double) (2*2*2*2)) << "\n"; // prop var dep L^4
+    cout << mean_abs_M/((double) (2*2)) << "\n"; // prop L^2
+
   }
 
   if (dims == 0||dims > 2){ // || means or

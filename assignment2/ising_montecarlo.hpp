@@ -38,7 +38,7 @@ public:
   void open_exp_vals_to_file(ofstream&file); //writes spin config to file;
   void write_exp_vals_to_file(double *expval,ofstream&file, int temp, double varM); //write expectation values to file
   void draw_acceptance(); // Mersenne twister
-  double * solve2D(int calibration, int MC, int rank); //uses other functions to solve and get observables
+  double * solve2D(int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
 };
 
 #endif
