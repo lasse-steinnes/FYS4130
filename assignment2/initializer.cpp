@@ -7,12 +7,11 @@
 using namespace std;
 using namespace chrono;
 
-void IsingMonteCarlo::init1D(int L, double T0, int n_T, int MC, int rank){
+void IsingMonteCarlo::init1D(int L, double T0, double T_end, int n_T, int *map){
   // make a string of spin configs
-  m_rank = rank; // rank of thread in parallelization
+  m_map = map; // index mapping
   m_nT = n_T; // number of temperatures to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
-  m_MC = MC; // number of Monte carlo cycles
 
   S1d = new int[L];
 
@@ -37,19 +36,31 @@ void IsingMonteCarlo::init1D(int L, double T0, int n_T, int MC, int rank){
   }
 
 
+  // filling in the T vector to be used in MC
+  m_T = new double[m_nT];
+  double dT;
+  if (n_T > 1){
+    dT = (T_end-T0)/((double) (n_T-1));
+  }else{
+    dT = 0;
+  }
+
+  for (int i = 0; i < m_nT; i++){
+    m_T[i] = T0 + i*dT;
+  }
+
 };
 
 
-void IsingMonteCarlo::init2D(int L, double T0, int n_T, int MC, int rank, int *map){
+void IsingMonteCarlo::init2D(int L, double T0, double T_end, int n_T, int *map){
   // make a square spin lattice with
   // ghost cells to enforce periodic boundary conditions
   // map is index mapping vector of length L + 2
 
   m_map = map; // index mapping
-  m_rank = rank; // rank of thread in parallelization
   m_nT = n_T; // number of temperatures to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
-  m_MC = MC; // number of Monte carlo cycles
+
 
   // Random spin configuration
   //Setting up lattice of L*L elements
@@ -76,4 +87,15 @@ void IsingMonteCarlo::init2D(int L, double T0, int n_T, int MC, int rank, int *m
     }
   }
 
+  m_T = new double[m_nT];
+  double dT;
+  if (n_T > 1){
+    dT = (T_end-T0)/((double) (n_T-1));
+  }else{
+    dT = 0;
+  }
+
+  for (int i = 0; i < m_nT; i++){
+    m_T[i] = T0 + i*dT;
+  }
 }

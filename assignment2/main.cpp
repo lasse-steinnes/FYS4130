@@ -37,11 +37,11 @@ int main(int argc, char const *argv[]){
   cin >> dims;
 
   // make a temperature pointer to use
-  double *T = new double[n_T];
-  double dT = (T_end-T_start)/(n_T-1);
-  for (int i = 0; i < n_T; i++){
-    T[i] = T_start + i*dT;
-  }
+  //double *T = new double[n_T];
+  //double dT = (T_end-T_start)/(n_T-1);
+  //for (int i = 0; i < n_T; i++){
+  //  T[i] = T_start + i*dT;
+  //}
 
   // setup mapping (1D and 2D) -- not sure if this is needed
   int * map = new int[L + 2]; // allocate
@@ -61,7 +61,10 @@ int main(int argc, char const *argv[]){
     map[i+1] = i;
   }
 
-    Solver.init2D(L, T[0], n_T, MC, rank, map);
+    Solver.init2D(L, T_start,T_end, n_T, map);
+    //int i = 0, j = 1;
+    //Solver.wolff_sampling2D(i,j);
+    Solver.solve2D(calib, MC, rank);
   }
 
   if (dims == 0||dims > 2){ // || means or
