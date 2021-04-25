@@ -28,6 +28,7 @@ double m_p; // probability of drawing one spin (1-exp(-2*m_beta))
 int m_calibration; // number of calibration cycles
 bool *cluster;
 bool *cluster1D;
+double *spin_r, *spin_0r;
 
 /*random number generator, seeded for each rank once */
  mt19937_64 m_gen;     // seeded with sd
@@ -39,14 +40,17 @@ public:
   void magnetic_moment1D();
   void magnetic_moment2D();
   void open_exp_vals_to_file(ofstream&file); //writes spin config to file;
-  void write_exp_vals_to_file(double *expval,ofstream&file, int temp, double varM); //write expectation values to file
+  void write_exp_vals_to_file(double *expval,ofstream&file, double temp, double varM); //write expectation values to file
   void draw_acceptance(); // Mersenne twister
-  double * solve1D(int r_corr, int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
+  double * solve1D(int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
   double * solve2D(int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
   void growCluster2D(int i, int j, int clusterSpin);
   void tryAdd2D(int i, int j, int clusterSpin);
   void growCluster1D(int i, int clusterSpin);
   void tryAdd1D(int i, int clusterSpin);
+  void get_observables();
+  void get_corr(double *arr);
+  void write_corr(double *arr, int temp);
 };
 
 #endif

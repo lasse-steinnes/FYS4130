@@ -25,12 +25,11 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
 
   // setting up needed parameters
   m_MC = MC; // number of Monte carlo cycles
-  int  m_MC2 = m_MC*m_MC;
   m_rank = rank; // rank of thread in parallelization
 
   m_calibration = calibration;
   m_L2 = m_L*m_L;
-  int n_expv = 4;
+  int n_expv = 3;
   //double *exp_values = new double[n_expv]; // The final expectation values
   double *exp_values = (double *) calloc(n_expv, sizeof(*exp_values));
   /*
@@ -51,7 +50,9 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
   m_gen.seed(td);
 
   double exp_val_M, exp_val_M2;  //expectation values for magnetization and magnetization squared
-  double exp_val_Mabs, varianceM;   //expectation value for mean absolute value of magnetization
+  double exp_valM4;
+  double M2;
+  double gamma;
 
   ofstream file_expv; // expectation values file, to close
   open_exp_vals_to_file(file_expv); // opens file to be written
@@ -61,8 +62,8 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
     // Initialize to zero for each temperature
     // state of S at in last MC cycle for previous temp
     magnetic_moment2D(); // calculate initial magnetic moment
-
-    m_beta = 1./((double) m_T[temp]);
+    double T = m_T[temp];
+    m_beta = 1./((double) T);
     m_p = 1.0 - exp(-2.0*m_beta); // J set to 1, k set to 1
 
     cout << "initial magnetic moment: " << m_MagneticMoment<<"\n" ;
@@ -86,7 +87,7 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
     // cycles contributing to mean and variance
     for (int i_bins = 0; i_bins < N_bins; i_bins++){
       exp_val_M = 0.0; exp_val_M2 = 0.0;
-      exp_val_Mabs = 0.0; varianceM = 0.0;
+      exp_valM4 = 0.0;
 
     for (int c = 0; c < m_MC; c++){ // cluster instead of single flip
       // no cluster defined so clear the cluster array
@@ -96,48 +97,43 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
           }
         }
 
+        //cout << "here \n";
         rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
         growCluster2D(rand_i, rand_j, S2d[rand_i*m_L + rand_j]);
         //cout << m_MagneticMoment << "\n";
         //adding expectation values from each cycle
+        M2 = m_MagneticMoment*m_MagneticMoment;
         exp_val_M += m_MagneticMoment;
-        exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
-        exp_val_Mabs += fabs(m_MagneticMoment);
+        exp_val_M2 += M2;
+        exp_valM4 += M2*M2;
+        //exp_val_Mabs += fabs(m_MagneticMoment);
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
 
     exp_values[0] += ((double) 1/m_MC)*exp_val_M;
-    exp_values[1] += ((double) 1/m_MC)*exp_val_Mabs;
-
-    //Calculating variance for magnetization
-    //Finding suceptibility m_xi
-    exp_val_M2 = ((double) 1/m_MC)*exp_val_M2;
-    varianceM = exp_val_M2 - ((double) 1/m_MC2)*exp_val_M*exp_val_M;
-    m_xi = varianceM/((double) m_T[temp]);
-
-    exp_values[2] += m_xi;
-    exp_values[3] += varianceM;
-    //cout << "xi: "  << exp_values[3] << "\n";
+    exp_values[1] += ((double) 1/m_MC)*exp_val_M2;
+    exp_values[2] +=  ((double) 1/m_MC)*exp_valM4;
     }
 
     // intrinsic adjust (prop to L) and total mean (divide by bins)
-    exp_values[2] = 1./((double) m_L2)*exp_values[2]; //xi
-    exp_values[3] = 1./((double) m_L2)*exp_values[3]; // variance
+    exp_values[1] = 1./((double) m_L2)*exp_values[1]; // m^2
+    exp_values[2] = 1./((double) m_L2*m_L2*m_L2)*exp_values[2]; // m^4
 
     // Scaling by L^2
     for(int i= 0; i < n_expv ;i++){
          exp_values[i] = 1./((double) m_L2*N_bins)*exp_values[i];
     }
 
-    write_exp_vals_to_file(exp_values,file_expv,temp,exp_values[3]);
+    gamma = exp_values[2]/((double) exp_values[1]*exp_values[1]);
+    write_exp_vals_to_file(exp_values,file_expv,T,gamma);
   }
   file_expv.close();
   return exp_values; // return something
 }
 
-double * IsingMonteCarlo::solve1D(int r_corr, int calibration, int MC, int N_bins, int rank){
+double * IsingMonteCarlo::solve1D(int calibration, int MC, int N_bins, int rank){
   /*
   Find the expectation values for a 2D steady state Ising Model
   for a given number of cycles
@@ -151,14 +147,13 @@ double * IsingMonteCarlo::solve1D(int r_corr, int calibration, int MC, int N_bin
 
   // setting up needed parameters
   m_MC = MC; // number of Monte carlo cycles
-  int  m_MC2 = m_MC*m_MC;
   m_rank = rank; // rank of thread in parallelization
 
   m_calibration = calibration;
-  //m_L2 = m_L*m_L;
-  int n_expv = 4;
-  //double *exp_values = new double[n_expv]; // The final expectation values
-  double *exp_values = (double *) calloc(n_expv, sizeof(*exp_values));
+  m_L2 = m_L*m_L;
+  int n_expv = m_L;
+  double *exp_values = new double[n_expv]; // The final expectation values
+  //double *exp_values = (double *) calloc(n_expv, sizeof(*exp_values));
   /*
   Mersenne twister random generator suggest
   flipping of spin with random index. PS: indices are thereafter mapped;
@@ -176,18 +171,13 @@ double * IsingMonteCarlo::solve1D(int r_corr, int calibration, int MC, int N_bin
   int td = chrono::high_resolution_clock::now().time_since_epoch().count() + m_rank; //<--  for parallellization;
   m_gen.seed(td);
 
-  double exp_val_M, exp_val_M2;  //expectation values for magnetization and magnetization squared
-  double exp_val_Mabs, varianceM;   //expectation value for mean absolute value of magnetization
-  int spin_0, spin_r, spin_0r;
-
-  ofstream file_expv; // expectation values file, to close
-  open_exp_vals_to_file(file_expv); // opens file to be written
+  //ofstream file_expv; // expectation values file, to close
+  //open_exp_vals_to_file(file_expv); // opens file to be written
   int rand_i;
   for (int temp = 0; temp < m_nT; temp++){
     // Initialize to zero for each temperature
     // state of S at in last MC cycle for previous temp
     magnetic_moment1D(); // calculate initial magnetic moment
-
     m_beta = 1./((double) m_T[temp]);
     m_p = 1.0 - exp(-2.0*m_beta); // J set to 1, k set to 1
 
@@ -207,9 +197,12 @@ double * IsingMonteCarlo::solve1D(int r_corr, int calibration, int MC, int N_bin
 
     // cycles contributing to mean and variance
     for (int i_bins = 0; i_bins < N_bins; i_bins++){
-      exp_val_M = 0.0; exp_val_M2 = 0.0;
-      exp_val_Mabs = 0.0; varianceM = 0.0;
-      spin0 = 0; spin_r = 0;
+      // zero out each time
+      for (int i = 0; i < m_L; i++){
+          spin_r[i] = 0;
+          spin_0r[i] = 0;
+        }
+
 
     for (int c = 0; c < m_MC; c++){ // cluster instead of single flip
       // no cluster defined so clear the cluster array
@@ -219,43 +212,35 @@ double * IsingMonteCarlo::solve1D(int r_corr, int calibration, int MC, int N_bin
 
         rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         growCluster1D(rand_i, S1d[rand_i]);
-        //cout << m_MagneticMoment << "\n";
-        //adding expectation values from each cycle
-        exp_val_M += m_MagneticMoment;
-        exp_val_M2 += m_MagneticMoment*m_MagneticMoment;
-        exp_val_Mabs += fabs(m_MagneticMoment);
-        spin_0 += S1d[0];
-        spin_r += S1d[r];
-        spin_0r += S1d[0]*S1d[r];
+        get_observables();
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
-
-    exp_values[0] += ((double) 1/m_MC)*exp_val_M;
-    exp_values[1] += ((double) 1/m_MC)*exp_val_Mabs;
-
-    //Calculating variance for magnetization
-    //Finding suceptibility m_xi
-    exp_val_M2 = ((double) 1/m_MC)*exp_val_M2;
-    varianceM = exp_val_M2 - ((double) 1/m_MC2)*exp_val_M*exp_val_M;
-    m_xi = varianceM/((double) m_T[temp]);
-
-    exp_values[2] += m_xi;
-    exp_values[3] += varianceM;
-    //cout << "xi: "  << exp_values[3] << "\n";
+    get_corr(exp_values);
     }
 
     // intrinsic adjust (prop to L) and total mean (divide by bins)
-    exp_values[2] = 1./((double) m_L)*exp_values[2]; //xi
-    exp_values[3] = 1./((double) m_L)*exp_values[3]; // variance
-
-    // Scaling by L^2
+    // Scaling by L^2 bc multiplication of terms
     for(int i= 0; i < n_expv ;i++){
-         exp_values[i] = 1./((double) m_L*N_bins)*exp_values[i];
+         exp_values[i] = 1./((double) m_L2*N_bins)*exp_values[i];
     }
-
-    write_exp_vals_to_file(exp_values,file_expv,temp,exp_values[3]);
+    write_corr(exp_values, temp);
   }
-  file_expv.close();
   return exp_values; // return something
+}
+
+void IsingMonteCarlo::get_observables(){
+  for (int i = 0; i < m_L; i++){
+    spin_r[i] += S1d[i];
+    spin_0r[i] += S1d[0]*S1d[i];
+  }
+}
+
+void IsingMonteCarlo::get_corr(double *arr){
+  // avg
+  for (int i = 0; i < m_L; i++){
+    spin_r[i] = ((double) 1/m_MC)*spin_r[i];
+    spin_0r[i]= ((double) 1/m_MC)*spin_0r[i];
+    arr[i] = spin_0r[i] - spin_r[0]*spin_r[i];
+  }
 }

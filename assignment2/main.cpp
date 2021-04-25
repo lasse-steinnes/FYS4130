@@ -14,24 +14,22 @@ int main(int argc, char const *argv[]){
   int L; int MC;
   double T_start, T_end;
   int n_T, numthreads, dims;
-  bool save_over_cycles = false;
-  bool save_spin = false;
   int calib;
   int rank = 0 ;
 
-  cout << "Enter integer number of spin particles for each axis:" << " ";
+  cout << "Enter integer number of spin particles for each axis: ";
   cin >> L;
-  cout << "Enter start point temperature:"  << " ";
+  cout << "Enter start point temperature: ";
   cin >> T_start;
-  cout << "Enter an endpoint temperature:"  << " ";
+  cout << "Enter an endpoint temperature: ";
   cin >> T_end;
-  cout << "Enter integer number of temperature points to be evaluated:"  << " ";
+  cout << "Enter integer number of temperature points to be evaluated: ";
   cin >> n_T;
-  cout << "Enter integer number of MC cycles:"  << " ";
+  cout << "Enter integer number of MC cycles: ";
   cin >> MC;
-  cout << "Enter integer number of calibration cycles:"  << " ";
+  cout << "Enter integer number of calibration cycles: ";
   cin >> calib; // eg. 20 000
-  cout << "Enter integer number of threads:"  << " ";
+  cout << "Enter integer number of threads: ";
   cin >> numthreads;
   cout << "Enter dimension (1/2) ";
   cin >> dims;
@@ -59,10 +57,10 @@ int main(int argc, char const *argv[]){
     ana = Solver.solve1D(calib, MC, N_bins, rank);
 
     cout << "numerical: \n";
-    for (int i = 0; i < 4; i++){
+    for (int i = 0; i < L; i++){
       cout << ana[i] << "\n";
     }
-    cout << "order : <M>, <|M|>, <Xi>, M_variance \n";
+    cout << "Above: Correlation values\n";
 
   }
 
@@ -95,13 +93,13 @@ int main(int argc, char const *argv[]){
     double xi = ((double) 32/(T*z))*(exp(8*B) + 1);
 
     cout << "numerical: \n";
-    for (int i = 0; i < 4; i++){
+    for (int i = 0; i < 3; i++){
       cout << ana[i] << "\n";
     }
-    cout << "order : <M>, <|M|>, <Xi>, M_variance \n";
+    cout << "order : <M>, <|M|> = <M^2>, <M^4> \n";
 
     cout << "\n";
-    cout << "analytical: \n";
+    cout << "analytical (2x2 T = 1): \n";
     cout << "xi: "<< xi/((double) (2*2*2*2)) << "\n"; // prop var dep L^4
     cout << "<|M|>" <<  mean_abs_M/((double) (2*2)) << "\n"; // prop L^2
 

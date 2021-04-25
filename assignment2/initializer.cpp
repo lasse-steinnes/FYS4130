@@ -15,6 +15,8 @@ void IsingMonteCarlo::init1D(int L, double T0, double T_end, int n_T, int *map){
 
   S1d = new int[L];
   cluster1D = new bool[m_L];
+  spin_r = new double[m_L];
+  spin_0r = new double[m_L];
 
   if(T0 >= 1.1) {        //Temperature check
     for(int i = 0; i < L; i++) {    //If the temperature is greater than 1.1,
