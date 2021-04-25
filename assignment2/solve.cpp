@@ -226,7 +226,7 @@ double * IsingMonteCarlo::solve1D(int calibration, int MC, int N_bins, int rank)
     }
     write_corr(exp_values, temp);
   }
-  return exp_values; // return something
+  return exp_values; // return correlation values
 }
 
 void IsingMonteCarlo::get_observables(){

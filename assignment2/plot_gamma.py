@@ -1,0 +1,1 @@
+# programme to plot gamma
