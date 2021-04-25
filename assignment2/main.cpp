@@ -62,7 +62,7 @@ int main(int argc, char const *argv[]){
     map[i+1] = i;
   }
 
-    double *ana = new double[3];
+    double *ana = new double[4];
 
     Solver.init2D(L, T_start,T_end, n_T, map);
     ana = Solver.solve2D(calib, MC, N_bins, rank);
@@ -84,12 +84,16 @@ int main(int argc, char const *argv[]){
     double mean_abs_M = (8./z)*(exp(8*B) + 2);
     double xi = ((double) 32/(T*z))*(exp(8*B) + 1);
 
-    for (int i = 0; i < 3; i++){
+    cout << "numerical: \n";
+    for (int i = 0; i < 4; i++){
       cout << ana[i] << "\n";
     }
+    cout << "order : <M>, <|M|>, <Xi>, M_variance \n";
 
-    cout << xi/((double) (2*2*2*2)) << "\n"; // prop var dep L^4
-    cout << mean_abs_M/((double) (2*2)) << "\n"; // prop L^2
+    cout << "\n";
+    cout << "analytical: \n";
+    cout << "xi: "<< xi/((double) (2*2*2*2)) << "\n"; // prop var dep L^4
+    cout << "<|M|>" <<  mean_abs_M/((double) (2*2)) << "\n"; // prop L^2
 
   }
 

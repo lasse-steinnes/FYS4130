@@ -27,6 +27,11 @@ int m_MagneticMoment2d; // total magnetization  (avg  = M/L^2)
 int m_MagneticMoment1d; // total magnetization  (avg  = M/L^2)
 double m_p; // probability of drawing one spin (1-exp(-2*m_beta))
 int m_calibration; // number of calibration cycles
+bool *cluster;
+
+/*random number generator, seeded for each rank once */
+ mt19937_64 m_gen;     // seeded with sd
+ uniform_real_distribution<double> m_distribution;  // creates [0,1)
 
 public:
   void init1D(int L, double T0, double T_end, int n_T, int *map); // initiates the 1D spin system
@@ -39,6 +44,8 @@ public:
   void write_exp_vals_to_file(double *expval,ofstream&file, int temp, double varM); //write expectation values to file
   void draw_acceptance(); // Mersenne twister
   double * solve2D(int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
+  void growCluster2D(int i, int j, int clusterSpin);
+  void tryAdd2D(int i, int j, int clusterSpin);
 };
 
 #endif

@@ -57,6 +57,12 @@ void IsingMonteCarlo::init2D(int L, double T0, double T_end, int n_T, int *map){
   // ghost cells to enforce periodic boundary conditions
   // map is index mapping vector of length L + 2
 
+  // allocate 2-D array for spin cluster labels
+   cluster = new bool[m_L];
+   for (int i = 0; i < m_L; i++)
+       cluster[i] = new bool [m_L];
+
+
   m_map = map; // index mapping
   m_nT = n_T; // number of temperatures to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
