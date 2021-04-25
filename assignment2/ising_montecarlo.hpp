@@ -23,11 +23,11 @@ int *S2d; // spin matrix
 int *S1d; // spin vector
 double *m_T; // temperature vector
 double m_check; // random number to initialize
-int m_MagneticMoment2d; // total magnetization  (avg  = M/L^2)
-int m_MagneticMoment1d; // total magnetization  (avg  = M/L^2)
+int m_MagneticMoment; // total magnetization  (avg  = M/L^2)
 double m_p; // probability of drawing one spin (1-exp(-2*m_beta))
 int m_calibration; // number of calibration cycles
 bool *cluster;
+bool *cluster1D;
 
 /*random number generator, seeded for each rank once */
  mt19937_64 m_gen;     // seeded with sd
@@ -38,14 +38,15 @@ public:
   void init2D(int L, double T0, double T_end, int n_T, int *map); // initiates the 2D spin system
   void magnetic_moment1D();
   void magnetic_moment2D();
-  void wolff_sampling2D(int node_i, int node_j); // sampling algo
-  void wolff_sampling1D(int node_id);
   void open_exp_vals_to_file(ofstream&file); //writes spin config to file;
   void write_exp_vals_to_file(double *expval,ofstream&file, int temp, double varM); //write expectation values to file
   void draw_acceptance(); // Mersenne twister
+  double * solve1D(int r_corr, int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
   double * solve2D(int calibration, int MC, int N_bins, int rank); //uses other functions to solve and get observables
   void growCluster2D(int i, int j, int clusterSpin);
   void tryAdd2D(int i, int j, int clusterSpin);
+  void growCluster1D(int i, int clusterSpin);
+  void tryAdd1D(int i, int clusterSpin);
 };
 
 #endif

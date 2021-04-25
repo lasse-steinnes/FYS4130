@@ -49,20 +49,30 @@ int main(int argc, char const *argv[]){
   map[L+1] = 0; // last index in map --> first index in physical mesh
   int N_bins = 10;
 
+  IsingMonteCarlo Solver;
+  double *ana = new double[4];
+
   if (dims == 1){
     // intialize 1D case
-    //Solver.init1D();
+
+    Solver.init1D(L, T_start,T_end, n_T, map);
+    ana = Solver.solve1D(calib, MC, N_bins, rank);
+
+    cout << "numerical: \n";
+    for (int i = 0; i < 4; i++){
+      cout << ana[i] << "\n";
+    }
+    cout << "order : <M>, <|M|>, <Xi>, M_variance \n";
+
   }
 
   if (dims == 2){
-    IsingMonteCarlo Solver;
     // initialize 2D case
 
   for (int i = 0; i < L; i++){
     map[i+1] = i;
   }
 
-    double *ana = new double[4];
 
     Solver.init2D(L, T_start,T_end, n_T, map);
     ana = Solver.solve2D(calib, MC, N_bins, rank);
