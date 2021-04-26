@@ -66,7 +66,6 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
     m_beta = 1./((double) T);
     m_p = 1.0 - exp(-2.0*m_beta); // J set to 1, k set to 1
 
-    cout << "initial magnetic moment: " << m_MagneticMoment<<"\n" ;
     // Calibration cycles: run through some percentage of samples before
     // adding energies and magnetic moment to expectation values and variances
     for (int c = 0; c < m_calibration; c++){ // cluster instead of single flip
@@ -241,6 +240,6 @@ void IsingMonteCarlo::get_corr(double *arr){
   for (int i = 0; i < m_L; i++){
     spin_r[i] = ((double) 1/m_MC)*spin_r[i];
     spin_0r[i]= ((double) 1/m_MC)*spin_0r[i];
-    arr[i] = spin_0r[i] - spin_r[0]*spin_r[i];
+    arr[i] += spin_0r[i] - spin_r[0]*spin_r[i];
   }
 }

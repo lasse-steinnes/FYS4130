@@ -7,9 +7,8 @@
 using namespace std;
 using namespace chrono;
 
-void IsingMonteCarlo::init1D(int L, double T0, double T_end, int n_T, int *map){
+void IsingMonteCarlo::init1D(int L, double T0, double T_end, int n_T){
   // make a string of spin configs
-  m_map = map; // index mapping
   m_nT = n_T; // number of temperatures to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
 
@@ -55,27 +54,21 @@ void IsingMonteCarlo::init1D(int L, double T0, double T_end, int n_T, int *map){
 };
 
 
-void IsingMonteCarlo::init2D(int L, double T0, double T_end, int n_T, int *map){
+void IsingMonteCarlo::init2D(int L, double T0, double T_end, int n_T){
   // make a square spin lattice with
   // ghost cells to enforce periodic boundary conditions
   // map is index mapping vector of length L + 2
 
   // allocate 2-D array for spin cluster labels
-   cluster = new bool[m_L];
-   for (int i = 0; i < m_L; i++)
-       cluster[i] = new bool [m_L];
 
-
-  m_map = map; // index mapping
   m_nT = n_T; // number of temperatures to loop over
   m_L = L; // number of spins along a given axis (square 2D system)
-
+  cluster = new bool[m_L*m_L];
 
   // Random spin configuration
   //Setting up lattice of L*L elements
   S2d = new int[L*L];
   draw_acceptance();    //Getting random number
-
   if(T0 >= 1.1) {        //Temperature check
     for(int i = 0; i < L*L; i++) {    //If the temperature is greater than 1.1,
       if(m_check < 0.5) {             //the lattice is filled with random spins.

@@ -50,7 +50,6 @@ void IsingMonteCarlo::growCluster1D(int i, int clusterSpin) {
     S1d[i] = -1*S1d[i];
     m_MagneticMoment += 2*S1d[i]; // change magnetic moment
 
-    // find the indices of the 4 neighbors
     // assuming periodic boundary conditions
     int iPrev = i == 0    ? m_L-1 : i-1;
     int iNext = i == m_L-1 ? 0    : i+1;

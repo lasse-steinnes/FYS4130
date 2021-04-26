@@ -13,7 +13,8 @@ using namespace chrono;
 int main(int argc, char const *argv[]){
   int L; int MC;
   double T_start, T_end;
-  int n_T, numthreads, dims;
+  int num_threads;
+  int n_T, dims;
   int calib;
   int rank = 0 ;
 
@@ -30,7 +31,7 @@ int main(int argc, char const *argv[]){
   cout << "Enter integer number of calibration cycles: ";
   cin >> calib; // eg. 20 000
   cout << "Enter integer number of threads: ";
-  cin >> numthreads;
+  cin >> num_threads;
   cout << "Enter dimension (1/2) ";
   cin >> dims;
 
@@ -42,9 +43,6 @@ int main(int argc, char const *argv[]){
   //}
 
   // setup mapping (1D and 2D) -- not sure if this is needed
-  int * map = new int[L + 2]; // allocate
-  map[0] = L - 1; // first index in map --> last index in physical mesh
-  map[L+1] = 0; // last index in map --> first index in physical mesh
   int N_bins = 10;
 
   IsingMonteCarlo Solver;
@@ -53,7 +51,7 @@ int main(int argc, char const *argv[]){
   if (dims == 1){
     // intialize 1D case
 
-    Solver.init1D(L, T_start,T_end, n_T, map);
+    Solver.init1D(L, T_start,T_end, n_T);
     ana = Solver.solve1D(calib, MC, N_bins, rank);
 
     cout << "numerical: \n";
@@ -66,14 +64,40 @@ int main(int argc, char const *argv[]){
 
   if (dims == 2){
     // initialize 2D case
+    // parallellize this
 
-  for (int i = 0; i < L; i++){
-    map[i+1] = i;
+    // define object types
+   int temps_i;
+   double dT;
+   double start, end;
+   double *T_vec;
+   T_vec = new double[num_threads + 1];
+   cout << "num threads: " << num_threads << "\n";
+
+   if (num_threads > 1){
+     dT = (T_end-T_start)/((double) (num_threads)); // if num threads 4 --> 5 points
+   }else{
+     dT = 0;
+   }
+
+   for (int i = 0; i < num_threads+1; i++){
+     T_vec[i] = T_start + i*dT;
+   }
+
+
+  start = omp_get_wtime();
+  omp_set_num_threads(num_threads);
+  #pragma omp parallel for private(temps_i)
+  for (temps_i = 0; temps_i < num_threads; temps_i++){
+    IsingMonteCarlo Solver; // initate class object;
+    Solver.init2D(L, T_vec[temps_i],T_vec[temps_i+1], n_T);
+    ana = Solver.solve2D(calib, MC, N_bins,  omp_get_thread_num());
+    printf("Thread rank: %d\n", omp_get_thread_num());
   }
+  end = omp_get_wtime();
+  printf("Work took %f seconds\n", end - start);
 
 
-    Solver.init2D(L, T_start,T_end, n_T, map);
-    ana = Solver.solve2D(calib, MC, N_bins, rank);
 
     /*
   int calibration = 20000;
@@ -84,7 +108,7 @@ int main(int argc, char const *argv[]){
   int n = 1;
   double B = 1./T;
   int rank = 0;
-    */
+
 
     double T = 1.0;
     double B = 1./T;
@@ -102,7 +126,7 @@ int main(int argc, char const *argv[]){
     cout << "analytical (2x2 T = 1): \n";
     cout << "xi: "<< xi/((double) (2*2*2*2)) << "\n"; // prop var dep L^4
     cout << "<|M|>" <<  mean_abs_M/((double) (2*2)) << "\n"; // prop L^2
-
+    */
   }
 
   if (dims == 0||dims > 2){ // || means or

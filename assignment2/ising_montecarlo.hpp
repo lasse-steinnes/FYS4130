@@ -18,7 +18,6 @@ double m_beta; // a given temperature
 int m_L, m_L2;  // number of spins in 1 dimension
 int m_MC; // monte carlo cycles
 double m_xi; //magnetic susceptibility
-int *m_map; // mapping
 int *S2d; // spin matrix
 int *S1d; // spin vector
 double *m_T; // temperature vector
@@ -35,8 +34,8 @@ double *spin_r, *spin_0r;
  uniform_real_distribution<double> m_distribution;  // creates [0,1)
 
 public:
-  void init1D(int L, double T0, double T_end, int n_T, int *map); // initiates the 1D spin system
-  void init2D(int L, double T0, double T_end, int n_T, int *map); // initiates the 2D spin system
+  void init1D(int L, double T0, double T_end, int n_T); // initiates the 1D spin system
+  void init2D(int L, double T0, double T_end, int n_T); // initiates the 2D spin system
   void magnetic_moment1D();
   void magnetic_moment2D();
   void open_exp_vals_to_file(ofstream&file); //writes spin config to file;

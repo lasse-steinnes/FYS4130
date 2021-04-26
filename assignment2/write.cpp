@@ -24,7 +24,7 @@ void IsingMonteCarlo::write_corr(double *arr, int temp){
   // open spin to file if true
   ofstream spinfile;
   string filename("./Results/Data/Corr1D" + to_string(m_MC) + \
-                  "-" + to_string(m_L) + "by" + to_string(m_L) + "rank" + to_string(m_rank) + ".txt");
+                  "-" + to_string(m_L) + "rank" + to_string(m_rank) + ".txt");
   spinfile.open(filename);
 
   // write spin file
