@@ -20,8 +20,8 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
   // calibration: number of calibration cycles
   // returns expectation values
   // calculates all cycles
-  // sends in the indices suggested if metropolis gives true
-  // update expectation values and flip
+  // sends in the indices suggested to wolff sampling
+  // update expectation values
 
   // setting up needed parameters
   m_MC = MC; // number of Monte carlo cycles
@@ -30,7 +30,6 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
   m_calibration = calibration;
   m_L2 = m_L*m_L;
   int n_expv = 3;
-  //double *exp_values = new double[n_expv]; // The final expectation values
   double *exp_values = (double *) calloc(n_expv, sizeof(*exp_values));
   /*
   Mersenne twister random generator suggest
@@ -67,9 +66,9 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
     m_p = 1.0 - exp(-2.0*m_beta); // J set to 1, k set to 1
 
     // Calibration cycles: run through some percentage of samples before
-    // adding energies and magnetic moment to expectation values and variances
+    // adding magnetic moment to expectation values and variances
     for (int c = 0; c < m_calibration; c++){ // cluster instead of single flip
-      // no cluster defined so clear the cluster array
+      // clear the cluster array
       for (int i = 0; i < m_L; i++){
         for (int j = 0; j < m_L; j++){
           cluster[i*m_L + j] = false; // false
@@ -78,9 +77,7 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
 
         rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
-        //cout << "idx :" << rand_i  << " " << rand_j << "\n";
         growCluster2D(rand_i, rand_j, S2d[rand_i*m_L + rand_j]);
-        //wolff_sampling2D(rand_i,rand_j);
     }
 
     // cycles contributing to mean and variance
@@ -96,17 +93,16 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
           }
         }
 
-        //cout << "here \n";
         rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
         rand_j =  distribution_j(gen_j); // Draw index j on physical mesh, suggest flip
         growCluster2D(rand_i, rand_j, S2d[rand_i*m_L + rand_j]);
-        //cout << m_MagneticMoment << "\n";
+
         //adding expectation values from each cycle
         M2 = m_MagneticMoment*m_MagneticMoment;
         exp_val_M += m_MagneticMoment;
         exp_val_M2 += M2;
         exp_valM4 += M2*M2;
-        //exp_val_Mabs += fabs(m_MagneticMoment);
+
     }
     //Get final expectation value over all cycles for this temperature: Dividing the sum with number
     //of MC cycles m_MC to get expectation values.
@@ -129,12 +125,12 @@ double * IsingMonteCarlo::solve2D(int calibration, int MC, int N_bins, int rank)
     write_exp_vals_to_file(exp_values,file_expv,T,gamma);
   }
   file_expv.close();
-  return exp_values; // return something
+  return exp_values; // return
 }
 
 double * IsingMonteCarlo::solve1D(int calibration, int MC, int N_bins, int rank){
   /*
-  Find the expectation values for a 2D steady state Ising Model
+  Find the expectation values for a 1D steady state Ising Model
   for a given number of cycles
   */
 
@@ -152,7 +148,7 @@ double * IsingMonteCarlo::solve1D(int calibration, int MC, int N_bins, int rank)
   m_L2 = m_L*m_L;
   int n_expv = m_L;
   double *exp_values = new double[n_expv]; // The final expectation values
-  //double *exp_values = (double *) calloc(n_expv, sizeof(*exp_values));
+
   /*
   Mersenne twister random generator suggest
   flipping of spin with random index. PS: indices are thereafter mapped;
@@ -170,19 +166,17 @@ double * IsingMonteCarlo::solve1D(int calibration, int MC, int N_bins, int rank)
   int td = chrono::high_resolution_clock::now().time_since_epoch().count() + m_rank; //<--  for parallellization;
   m_gen.seed(td);
 
-  //ofstream file_expv; // expectation values file, to close
-  //open_exp_vals_to_file(file_expv); // opens file to be written
   int rand_i;
   for (int temp = 0; temp < m_nT; temp++){
     // Initialize to zero for each temperature
-    // state of S at in last MC cycle for previous temp
+
     magnetic_moment1D(); // calculate initial magnetic moment
     m_beta = 1./((double) m_T[temp]);
     m_p = 1.0 - exp(-2.0*m_beta); // J set to 1, k set to 1
 
     cout << "initial magnetic moment: " << m_MagneticMoment<<"\n" ;
     // Calibration cycles: run through some percentage of samples before
-    // adding energies and magnetic moment to expectation values and variances
+    // adding magnetic moment to expectation values and variances
     for (int c = 0; c < m_calibration; c++){ // cluster instead of single flip
       // no cluster defined so clear the cluster array
       for (int i = 0; i < m_L; i++){
@@ -190,7 +184,6 @@ double * IsingMonteCarlo::solve1D(int calibration, int MC, int N_bins, int rank)
         }
 
         rand_i =  distribution_i(gen_i); // Draw index i on physical mesh, suggest flip
-        //cout << "idx :" << rand_i  << " " << rand_j << "\n";
         growCluster1D(rand_i, S1d[rand_i]);
     }
 

@@ -56,9 +56,6 @@ void IsingMonteCarlo::init1D(int L, double T0, double T_end, int n_T){
 
 void IsingMonteCarlo::init2D(int L, double T0, double T_end, int n_T){
   // make a square spin lattice with
-  // ghost cells to enforce periodic boundary conditions
-  // map is index mapping vector of length L + 2
-
   // allocate 2-D array for spin cluster labels
 
   m_nT = n_T; // number of temperatures to loop over

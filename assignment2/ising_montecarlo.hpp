@@ -25,9 +25,9 @@ double m_check; // random number to initialize
 int m_MagneticMoment; // total magnetization  (avg  = M/L^2)
 double m_p; // probability of drawing one spin (1-exp(-2*m_beta))
 int m_calibration; // number of calibration cycles
-bool *cluster;
-bool *cluster1D;
-double *spin_r, *spin_0r;
+bool *cluster; // cluster array false/true 2D case
+bool *cluster1D; // cluster array false/true 1D case
+double *spin_r, *spin_0r; // correlation function params (1D case)
 
 /*random number generator, seeded for each rank once */
  mt19937_64 m_gen;     // seeded with sd

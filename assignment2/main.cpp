@@ -1,6 +1,4 @@
 // main for assignment 2 in statistical mechanics about the Ising Model
-//#define CATCH_CONFIG_RUNNER // This tells Catch to not provide a main()
-//#include "catch.hpp"
 #include "ising_montecarlo.hpp"
 #include <iostream>
 #include <omp.h>
@@ -35,13 +33,6 @@ int main(int argc, char const *argv[]){
   cout << "Enter dimension (1/2) ";
   cin >> dims;
 
-  // make a temperature pointer to use
-  //double *T = new double[n_T];
-  //double dT = (T_end-T_start)/(n_T-1);
-  //for (int i = 0; i < n_T; i++){
-  //  T[i] = T_start + i*dT;
-  //}
-
   // setup mapping (1D and 2D) -- not sure if this is needed
   int N_bins = 10;
 
@@ -49,7 +40,7 @@ int main(int argc, char const *argv[]){
   double *ana = new double[4];
 
   if (dims == 1){
-    // intialize 1D case
+    // intialize and solve 1D case
 
     Solver.init1D(L, T_start,T_end, n_T);
     ana = Solver.solve1D(calib, MC, N_bins, rank);
@@ -96,37 +87,6 @@ int main(int argc, char const *argv[]){
   }
   end = omp_get_wtime();
   printf("Work took %f seconds\n", end - start);
-
-
-
-    /*
-  int calibration = 20000;
-  int L = 2;
-  int MC = 1e7;
-  double T = 1.0;
-  double T2 = 1.0;
-  int n = 1;
-  double B = 1./T;
-  int rank = 0;
-
-
-    double T = 1.0;
-    double B = 1./T;
-    double z = 12. + 4*cosh(8*B);
-    double mean_abs_M = (8./z)*(exp(8*B) + 2);
-    double xi = ((double) 32/(T*z))*(exp(8*B) + 1);
-
-    cout << "numerical: \n";
-    for (int i = 0; i < 3; i++){
-      cout << ana[i] << "\n";
-    }
-    cout << "order : <M>, <|M|> = <M^2>, <M^4> \n";
-
-    cout << "\n";
-    cout << "analytical (2x2 T = 1): \n";
-    cout << "xi: "<< xi/((double) (2*2*2*2)) << "\n"; // prop var dep L^4
-    cout << "<|M|>" <<  mean_abs_M/((double) (2*2)) << "\n"; // prop L^2
-    */
   }
 
   if (dims == 0||dims > 2){ // || means or

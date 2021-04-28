@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 from scipy.signal import savgol_filter
 
 
-Ncycles = 50000      #number of monte carlo cycles
+Ncycles = 50000         #number of monte carlo cycles
 Tnum = 100              #number of temperature points for each core
-Tpoints = 4*Tnum       #number of temperature points for the region T = [2.2,2.4]
+Tpoints = 4*Tnum        #number of temperature points for the region T = [2.2,2.4]
 
 L = np.array([8,16,32])    #different values of lattice size L
 
-#storing temperatures, energy, mean magnetization, heat capacity and Susceptibility
+#storing temperatures, mean magnetization
 #stored for each value of L
 T = np.zeros((4,int(Tpoints)))
 gamma = np.zeros((4,int(Tpoints)))

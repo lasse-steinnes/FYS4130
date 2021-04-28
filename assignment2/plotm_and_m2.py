@@ -4,13 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-Ncycles = 10000      #number of monte carlo cycles
-Tnum = 20             #number of temperature points for each core
-Tpoints = 4*Tnum       #number of temperature points for the region
+Ncycles = 10000         #number of monte carlo cycles
+Tnum = 20               #number of temperature points for each core
+Tpoints = 4*Tnum        #number of temperature points for the region
 
 L = 16     # Lattice size L
 
-#storing temperatures, energy, mean magnetization, heat capacity and Susceptibility
+#storing temperatures, mean magnetization
 #stored for each value of L
 T = np.zeros(int(Tpoints))
 M = np.zeros(int(Tpoints))
