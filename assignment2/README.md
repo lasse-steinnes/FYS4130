@@ -1,5 +1,5 @@
 # FYS4130
-Git for Assignment 1 in the UiO course FYS4130 (Statistical Mechanics)
+Git for Assignment 2 in the UiO course FYS4130 (Statistical Mechanics)
 
 ### Main overview
 * The programs in this repository aim at finding expectation values for a 1D and 2D Ising Model, studying phase transition in a ferromagnetic system.
