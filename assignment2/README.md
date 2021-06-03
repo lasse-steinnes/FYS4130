@@ -10,6 +10,10 @@ Git for Assignment 2 in the UiO course FYS4130 (Statistical Mechanics)
 
 * The calculations are performed with the energy coefficent J, and boltzmann factor, k, set to 1. With this scaling the critical temperature is approximately 2.269 in the termodynamical limit L -> infinity (infinite number of spins in 2D system). Termodynamical properties are scaled by number of spins (1D: L/ 2D: L^2), since the expectation values are an extensive parameters, meaning that the amplitude of magnetic moment depends on the size of the 1D/2D spin system.
 
+### Comments
+Comments on the renormalization group (RG) argument in the pdf: Since the fraction is a dimensionless quantity, the transformation suggested has a slight error.  
+
+
 ### Code: Link and description of programmes
 - [initalizer.cpp](https://github.com/lasse-steinnes/FYS4130/blob/main/assignment2/initializer.cpp) : Initializes parameters and spin vectors.
 
